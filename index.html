@@ -24,10 +24,20 @@
       <h1 class="container-header">Expense Tracker</h1>
 
       <div class="expense-form">
-        <input type="text" placeholder="Expense name" id="expense-name" />
-        <input type="number" placeholder="Amount" id="expense-amount" />
-        <input type="date" id="expense-date" />
-        <select id="expense-category">
+        <input
+          type="text"
+          placeholder="Expense name"
+          id="expense-name"
+          required
+        />
+        <input
+          type="number"
+          placeholder="Amount"
+          id="expense-amount"
+          required
+        />
+        <input type="date" id="expense-date" required />
+        <select id="expense-category" required>
           <option>Select Category</option>
           <!-- Will Add other options Dynamially through JS -->
         </select>
@@ -60,8 +70,10 @@
         </table>
       </div>
 
-      <div class="total-expense">
-        Total Expense: &#8377; <span id="total-amount">0.00</span>
+      <div class="expense-amount">
+        <div class="total-expense">
+          Overall Expense: &#8377; <span id="total-amount">0.00</span>
+        </div>
       </div>
     </div>
     <script src="script.js"></script>
