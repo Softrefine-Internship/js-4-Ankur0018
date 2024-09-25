@@ -105,7 +105,7 @@ const displayTotalAmount = function () {
 // Display total for filtered category
 const displayCategoryTotal = function (filterCategory) {
   const categoryTotal = expenseData.expenses
-    .filter((exp) => exp.category === filterCategory) // Fixed typo here
+    .filter((exp) => exp.category === filterCategory)
     .reduce((sum, exp) => sum + exp.amount, 0);
 
   categoryTotalDisplay.innerHTML = `Expense for ${filterCategory}: &#8377; ${categoryTotal.toFixed(
@@ -129,16 +129,33 @@ const clearInput = function () {
 };
 
 // Form validation and functionality for adding expense
+// Form validation and functionality for adding expense
 const addExpense = function () {
   const name = inputExpenseName.value;
-  const amount = +inputExpenseAmount.value;
+  const amount = inputExpenseAmount.value;
   const date = inputExpenseDate.value;
   const category = selectExpenseCategory.value;
 
-  if (name && !isNaN(amount) && date && category !== "Select Category") {
+  // Regex to check for positive integers only
+  const isValidAmount = /^[1-9]\d*$/; // This allows only positive integers without leading zeros
+
+  // Checking if all fields are filled and amount is valid
+  if (
+    name &&
+    date &&
+    category !== "Select Category" &&
+    isValidAmount.test(amount)
+  ) {
+    const amountAsNumber = parseFloat(amount);
+
+    if (amountAsNumber <= 0) {
+      alert("Expense amount must be positive.");
+      return;
+    }
+
     const newExpense = {
       name,
-      amount,
+      amount: amountAsNumber,
       date,
       category,
     };
@@ -147,7 +164,7 @@ const addExpense = function () {
     updateUI();
     clearInput();
   } else {
-    alert("Please fill out all fields correctly.");
+    alert("Please fill out all fields correctly with a valid integer amount.");
   }
 };
 
@@ -157,7 +174,40 @@ btnAddExpense.addEventListener("click", function (e) {
   addExpense();
 });
 
-// Delete expense function
+// Accessing modal and overlay elements
+const modal = document.createElement("div");
+modal.id = "delete-modal";
+modal.classList.add("hidden");
+modal.innerHTML = `
+  <div class="modal-content">
+    <h3>Are you sure you want to delete this expense?</h3>
+    <button id="confirm-delete">Yes, Delete</button>
+    <button id="cancel-delete">Cancel</button>
+  </div>
+`;
+document.body.appendChild(modal);
+
+const overlay = document.createElement("div");
+overlay.id = "overlay";
+overlay.classList.add("hidden");
+document.body.appendChild(overlay);
+
+let expenseToDelete = null;
+
+// Function to open the confirmation modal
+const openModal = function () {
+  modal.classList.remove("hidden");
+  overlay.classList.remove("hidden");
+};
+
+// Function to close the modal
+const closeModal = function () {
+  modal.classList.add("hidden");
+  overlay.classList.add("hidden");
+  expenseToDelete = null;
+};
+
+// Function to delete the expense after confirmation
 const deleteExpense = function (name, date, amount, category) {
   expenseData.expenses = expenseData.expenses.filter(
     (exp) =>
@@ -169,6 +219,7 @@ const deleteExpense = function (name, date, amount, category) {
   updateUI();
 };
 
+// Event listener for clicking delete buttons in the table
 expensesTableBody.addEventListener("click", function (e) {
   if (e.target.classList.contains("delete-expense")) {
     const name = e.target.getAttribute("data-name");
@@ -176,8 +227,33 @@ expensesTableBody.addEventListener("click", function (e) {
     const amount = parseFloat(e.target.getAttribute("data-amount"));
     const category = e.target.getAttribute("data-category");
 
-    deleteExpense(name, date, amount, category);
+    expenseToDelete = { name, date, amount, category };
+
+    openModal();
   }
+});
+
+// Event listener for confirming deletion
+document
+  .getElementById("confirm-delete")
+  .addEventListener("click", function () {
+    if (expenseToDelete) {
+      deleteExpense(
+        expenseToDelete.name,
+        expenseToDelete.date,
+        expenseToDelete.amount,
+        expenseToDelete.category
+      );
+    }
+    closeModal();
+  });
+
+document.getElementById("cancel-delete").addEventListener("click", function () {
+  closeModal();
+});
+
+overlay.addEventListener("click", function () {
+  closeModal();
 });
 
 // Initialize on window load
