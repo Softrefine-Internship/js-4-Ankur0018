@@ -1,4 +1,4 @@
-# DOM Manipulation 
+# DOM Manipulation
 
 ### Project Description
 
@@ -6,8 +6,8 @@ The goal of this assignment is to create a user-friendly Expense Tracker App usi
 
 ### Requirements:
 
-1. User Interface (UI): 
-Design and implement an intuitive and visually appealing UI for the Expense Tracker App. The UI should consist of the following components:
+1. User Interface (UI):
+   Design and implement an intuitive and visually appealing UI for the Expense Tracker App. The UI should consist of the following components:
 
 - Input fields for entering the expense name, amount, and date.
 - A drop-down menu to select the expense category.
@@ -40,8 +40,7 @@ Design and implement an intuitive and visually appealing UI for the Expense Trac
 
 3. Check the current status of your repository by running the following command:
    </br>
-   `git status`
-
+   `git status
 4. Add any modified or new files to the staging area by executing the following command:
    </br>
    `git add .`
