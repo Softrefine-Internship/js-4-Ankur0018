@@ -17,7 +17,6 @@ const totalAmountDisplay = document.getElementById("total-amount");
 
 const initializeCategoriesDropdown = function () {
   expenseData.categories.forEach((category) => {
-    // Adding options in both Category and Filter Select field
     const option = document.createElement("option");
     option.value = category;
     option.textContent = category;
@@ -30,11 +29,14 @@ const initializeCategoriesDropdown = function () {
   });
 };
 
+// Disable future dates in the date picker
+const today = new Date().toISOString().split("T")[0];
+inputExpenseDate.setAttribute("max", today);
+
 const categoryTotalDisplay = document.createElement("div");
 categoryTotalDisplay.id = "category-total";
 document.querySelector(".expense-amount").appendChild(categoryTotalDisplay);
 
-// Formatting Date for UI and displaying relative dates (Today, Yesterday)
 const formatDate = function (date) {
   const today = new Date();
   const expenseDate = new Date(date);
@@ -45,7 +47,6 @@ const formatDate = function (date) {
   return new Date(date).toLocaleDateString("en-IN");
 };
 
-// Showing expenses function
 const showExpenses = function (filterCategory = "All") {
   expensesTableBody.innerHTML = "";
 
@@ -73,7 +74,6 @@ const showExpenses = function (filterCategory = "All") {
       .insertAdjacentHTML("beforeend", newRow);
   });
 
-  // Show category total only if an individual category is selected
   if (filterCategory !== "All") {
     displayCategoryTotal(filterCategory);
     categoryTotalDisplay.style.display = "block";
@@ -82,17 +82,14 @@ const showExpenses = function (filterCategory = "All") {
   }
 };
 
-// Filter expenses based on category selection
 selectFilterCategory.addEventListener("change", function (e) {
   showExpenses(e.target.value);
 });
 
-// Saving expenses to local storage
 const saveExpensesToLocalStorage = function () {
   localStorage.setItem("expenses", JSON.stringify(expenseData.expenses));
 };
 
-// Updating total expense amount and display
 const displayTotalAmount = function () {
   const totalAmount = expenseData.expenses.reduce(
     (sum, expense) => sum + expense.amount,
@@ -102,7 +99,6 @@ const displayTotalAmount = function () {
   totalAmountDisplay.textContent = totalAmount.toFixed(2);
 };
 
-// Display total for filtered category
 const displayCategoryTotal = function (filterCategory) {
   const categoryTotal = expenseData.expenses
     .filter((exp) => exp.category === filterCategory)
@@ -113,14 +109,12 @@ const displayCategoryTotal = function (filterCategory) {
   )}`;
 };
 
-// Updating the UI
 const updateUI = function () {
   showExpenses(selectFilterCategory.value);
   displayTotalAmount();
   saveExpensesToLocalStorage();
 };
 
-// Clear form inputs function
 const clearInput = function () {
   inputExpenseName.value = "";
   inputExpenseDate.value = "";
@@ -128,47 +122,66 @@ const clearInput = function () {
   selectExpenseCategory.value = "Select Category";
 };
 
-// Form validation and functionality for adding expense
-// Form validation and functionality for adding expense
 const addExpense = function () {
-  const name = inputExpenseName.value;
-  const amount = inputExpenseAmount.value;
+  const name = inputExpenseName.value.trim();
+  const amount = inputExpenseAmount.value.trim();
   const date = inputExpenseDate.value;
   const category = selectExpenseCategory.value;
 
-  // Regex to check for positive integers only
-  const isValidAmount = /^[1-9]\d*$/; // This allows only positive integers without leading zeros
+  const nameError = document.querySelector(".name-error");
+  const amountError = document.querySelector(".amount-error");
+  const dateError = document.querySelector(".date-error");
+  const categoryError = document.querySelector(".category-error");
 
-  // Checking if all fields are filled and amount is valid
-  if (
-    name &&
-    date &&
-    category !== "Select Category" &&
-    isValidAmount.test(amount)
-  ) {
+  let isValid = true;
+
+  if (!name) {
+    nameError.textContent = "Expense name cannot be empty.";
+    inputExpenseName.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    nameError.textContent = "";
+    inputExpenseName.style.border = "";
+  }
+
+  const amountPattern = /^\d*\.?\d+$/;
+
+  if (!amount || !amountPattern.test(amount)) {
+    amountError.textContent = "Please enter a valid positive number.";
+    inputExpenseAmount.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    amountError.textContent = "";
+    inputExpenseAmount.style.border = "";
+  }
+
+  if (!date) {
+    dateError.textContent = "Please select a valid date.";
+    inputExpenseDate.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    dateError.textContent = "";
+    inputExpenseDate.style.border = "";
+  }
+
+  if (category === "Select Category") {
+    categoryError.textContent = "Please select a category.";
+    selectExpenseCategory.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    categoryError.textContent = "";
+    selectExpenseCategory.style.border = "";
+  }
+
+  if (isValid) {
     const amountAsNumber = parseFloat(amount);
-
-    if (amountAsNumber <= 0) {
-      alert("Expense amount must be positive.");
-      return;
-    }
-
-    const newExpense = {
-      name,
-      amount: amountAsNumber,
-      date,
-      category,
-    };
-
+    const newExpense = { name, amount: amountAsNumber, date, category };
     expenseData.expenses.push(newExpense);
     updateUI();
     clearInput();
-  } else {
-    alert("Please fill out all fields correctly with a valid integer amount.");
   }
 };
 
-// Add expense event listener
 btnAddExpense.addEventListener("click", function (e) {
   e.preventDefault();
   addExpense();
@@ -256,8 +269,5 @@ overlay.addEventListener("click", function () {
   closeModal();
 });
 
-// Initialize on window load
-window.onload = function () {
-  initializeCategoriesDropdown();
-  updateUI();
-};
+initializeCategoriesDropdown();
+updateUI();

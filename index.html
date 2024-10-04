@@ -24,24 +24,43 @@
       <h1 class="container-header">Expense Tracker</h1>
 
       <div class="expense-form">
-        <input
-          type="text"
-          placeholder="Expense name"
-          id="expense-name"
-          required
-        />
-        <input
-          type="number"
-          placeholder="Amount"
-          id="expense-amount"
-          required
-        />
-        <input type="date" id="expense-date" required />
-        <select id="expense-category" required>
-          <option>Select Category</option>
-          <!-- Will Add other options Dynamially through JS -->
-        </select>
-        <button id="add-expense">Add Expense</button>
+        <div class="input-wrapper name-container">
+          <input
+            type="text"
+            placeholder="Expense name"
+            id="expense-name"
+            required
+          />
+          <div class="error-message name-error"></div>
+        </div>
+
+        <div class="input-wrapper amount-container">
+          <input
+            type="number"
+            placeholder="Amount"
+            id="expense-amount"
+            required
+          />
+          <div class="error-message amount-error"></div>
+        </div>
+
+        <div class="input-wrapper date-container">
+          <input type="date" id="expense-date" required />
+          <div class="error-message date-error"></div>
+        </div>
+
+        <div class="input-wrapper category-container">
+          <select id="expense-category" required>
+            <option>Select Category</option>
+            <!-- Will Add other options Dynamially through JS -->
+          </select>
+          <div class="error-message category-error"></div>
+        </div>
+
+        <div class="input-wrapper add-container">
+          <button id="add-expense">Add Expense</button>
+          <div class="error-message"></div>
+        </div>
       </div>
 
       <div class="expense-filter-container">
