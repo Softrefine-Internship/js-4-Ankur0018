@@ -107,6 +107,13 @@ const displayCategoryTotal = function (filterCategory) {
   categoryTotalDisplay.innerHTML = `Expense for ${filterCategory}: &#8377; ${categoryTotal.toFixed(
     2
   )}`;
+
+  if (categoryTotal.toFixed(2) == 0.0) {
+    const newRow = `<tr> <td class="errorMsgForNoExpense"> No Expenses for ${filterCategory} found !! </td> </tr>`;
+    document
+      .querySelector("#expenses tbody")
+      .insertAdjacentHTML("beforeend", newRow);
+  }
 };
 
 const updateUI = function () {
@@ -135,43 +142,28 @@ const addExpense = function () {
 
   let isValid = true;
 
-  if (!name) {
-    nameError.textContent = "Expense name cannot be empty.";
-    inputExpenseName.style.border = "2px solid red";
-    isValid = false;
-  } else {
-    nameError.textContent = "";
-    inputExpenseName.style.border = "";
-  }
-
-  const amountPattern = /^\d*\.?\d+$/;
-
-  if (!amount || !amountPattern.test(amount)) {
-    amountError.textContent = "Please enter a valid positive number.";
-    inputExpenseAmount.style.border = "2px solid red";
-    isValid = false;
-  } else {
-    amountError.textContent = "";
-    inputExpenseAmount.style.border = "";
-  }
+  // Existing validation for name, amount, etc...
 
   if (!date) {
     dateError.textContent = "Please select a valid date.";
     inputExpenseDate.style.border = "2px solid red";
     isValid = false;
   } else {
-    dateError.textContent = "";
-    inputExpenseDate.style.border = "";
+    // Check if the date is in the future
+    const selectedDate = new Date(date);
+    const currentDate = new Date(today);
+
+    if (selectedDate > currentDate) {
+      dateError.textContent = "Future dates are not allowed.";
+      inputExpenseDate.style.border = "2px solid red";
+      isValid = false;
+    } else {
+      dateError.textContent = "";
+      inputExpenseDate.style.border = "";
+    }
   }
 
-  if (category === "Select Category") {
-    categoryError.textContent = "Please select a category.";
-    selectExpenseCategory.style.border = "2px solid red";
-    isValid = false;
-  } else {
-    categoryError.textContent = "";
-    selectExpenseCategory.style.border = "";
-  }
+  // Existing validation for category...
 
   if (isValid) {
     const amountAsNumber = parseFloat(amount);

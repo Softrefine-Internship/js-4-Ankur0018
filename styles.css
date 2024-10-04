@@ -401,4 +401,10 @@ body {
   color: red;
   font-size: 1.2rem;
   margin-top: 0.4rem;
+  height: 1.5rem;
+}
+
+.errorMsgForNoExpense {
+  text-align: center !important;
+  font-size: 1.8rem !important;
 }

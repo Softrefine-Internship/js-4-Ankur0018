@@ -29,6 +29,7 @@
             type="text"
             placeholder="Expense name"
             id="expense-name"
+            maxlength="25"
             required
           />
           <div class="error-message name-error"></div>
@@ -45,7 +46,7 @@
         </div>
 
         <div class="input-wrapper date-container">
-          <input type="date" id="expense-date" required />
+          <input type="date" id="expense-date" max="" required />
           <div class="error-message date-error"></div>
         </div>
 
@@ -59,7 +60,6 @@
 
         <div class="input-wrapper add-container">
           <button id="add-expense">Add Expense</button>
-          <div class="error-message"></div>
         </div>
       </div>
 
