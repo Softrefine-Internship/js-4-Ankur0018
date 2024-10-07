@@ -40,6 +40,7 @@
             type="number"
             placeholder="Amount"
             id="expense-amount"
+            maxlength="15"
             required
           />
           <div class="error-message amount-error"></div>
@@ -50,16 +51,19 @@
           <div class="error-message date-error"></div>
         </div>
 
-        <div class="input-wrapper category-container">
-          <select id="expense-category" required>
-            <option>Select Category</option>
-            <!-- Will Add other options Dynamially through JS -->
-          </select>
-          <div class="error-message category-error"></div>
-        </div>
+        <div class="category-add-flex">
+          <div class="input-wrapper category-container">
+            <select id="expense-category" required>
+              <option>Select Category</option>
+              <!-- Will Add other options Dynamially through JS -->
+            </select>
+            <div class="error-message category-error"></div>
+          </div>
 
-        <div class="input-wrapper add-container">
-          <button id="add-expense">Add Expense</button>
+          <div class="input-wrapper add-container">
+            <button id="add-expense">Add Expense</button>
+            <div class="error-message add-error"></div>
+          </div>
         </div>
       </div>
 
@@ -91,7 +95,7 @@
 
       <div class="expense-amount">
         <div class="total-expense">
-          Overall Expense: &#8377; <span id="total-amount">0.00</span>
+          Overall Expense: <span id="total-amount">0.00</span>
         </div>
       </div>
     </div>

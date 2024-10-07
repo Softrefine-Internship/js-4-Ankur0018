@@ -58,9 +58,15 @@ const showExpenses = function (filterCategory = "All") {
         );
 
   filteredExpenses.forEach((exp) => {
+    const amountFormatted = new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2,
+    }).format(exp.amount);
+
     const newRow = `<tr>
                     <td>${exp.name}</td>
-                    <td>${exp.amount.toFixed(2)} &#8377;</td>
+                    <td>${amountFormatted}</td>
                     <td>${formatDate(exp.date)}</td>
                     <td>${exp.category}</td>
                     <td><button class="delete-expense" data-name="${
@@ -96,7 +102,11 @@ const displayTotalAmount = function () {
     0
   );
   expenseData.totalAmount = totalAmount;
-  totalAmountDisplay.textContent = totalAmount.toFixed(2);
+  totalAmountDisplay.textContent = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2,
+  }).format(totalAmount);
 };
 
 const displayCategoryTotal = function (filterCategory) {
@@ -142,14 +152,20 @@ const addExpense = function () {
 
   let isValid = true;
 
-  // Existing validation for name, amount, etc...
+  if (!name) {
+    nameError.textContent = "Expense name cannot be empty.";
+    inputExpenseName.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    nameError.textContent = "";
+    inputExpenseName.style.border = "";
+  }
 
   if (!date) {
     dateError.textContent = "Please select a valid date.";
     inputExpenseDate.style.border = "2px solid red";
     isValid = false;
   } else {
-    // Check if the date is in the future
     const selectedDate = new Date(date);
     const currentDate = new Date(today);
 
@@ -163,10 +179,35 @@ const addExpense = function () {
     }
   }
 
-  // Existing validation for category...
+  const amountPattern = /^\d+(\.\d{1,2})?$/;
+  const amountAsNumber = parseFloat(amount);
+
+  if (!amount || !amountPattern.test(amount) || amountAsNumber <= 0) {
+    amountError.textContent = "Please enter a valid amount.";
+    inputExpenseAmount.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    if (amountAsNumber > 100000000000000) {
+      amountError.textContent =
+        "Please enter a valid amount between 0 and 1,000,000,000,000,00.";
+      inputExpenseAmount.style.border = "2px solid red";
+      isValid = false;
+    } else {
+      amountError.textContent = "";
+      inputExpenseAmount.style.border = "";
+    }
+  }
+
+  if (category === "Select Category") {
+    categoryError.textContent = "Please select a category.";
+    selectExpenseCategory.style.border = "2px solid red";
+    isValid = false;
+  } else {
+    categoryError.textContent = "";
+    selectExpenseCategory.style.border = "";
+  }
 
   if (isValid) {
-    const amountAsNumber = parseFloat(amount);
     const newExpense = { name, amount: amountAsNumber, date, category };
     expenseData.expenses.push(newExpense);
     updateUI();
