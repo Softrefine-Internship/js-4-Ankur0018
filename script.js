@@ -47,6 +47,54 @@ const formatDate = function (date) {
   return new Date(date).toLocaleDateString("en-IN");
 };
 
+selectFilterCategory.addEventListener("change", function (e) {
+  showExpenses(e.target.value);
+});
+
+const saveExpensesToLocalStorage = function () {
+  localStorage.setItem("expenses", JSON.stringify(expenseData.expenses));
+};
+
+const formatLargeAmount = function (amount) {
+  if (amount >= 1e24) {
+    return (amount / 1e24).toFixed(2) + "Y"; // Septillion (Yotta)
+  } else if (amount >= 1e21) {
+    return (amount / 1e21).toFixed(2) + "Z"; // Sextillion (Zetta)
+  } else if (amount >= 1e18) {
+    return (amount / 1e18).toFixed(2) + "Q"; // Quintillion
+  } else if (amount >= 1e15) {
+    return (amount / 1e15).toFixed(2) + "P"; // Quadrillion
+  } else if (amount >= 1e12) {
+    return (amount / 1e12).toFixed(2) + "T"; // Trillion
+  } else if (amount >= 1e9) {
+    return (amount / 1e9).toFixed(2) + "B"; // Billion
+  } else if (amount >= 1e6) {
+    return (amount / 1e6).toFixed(2) + "M"; // Million
+  } else if (amount >= 1e3) {
+    return (amount / 1e3).toFixed(2) + "K"; // Thousand
+  } else {
+    return amount.toFixed(2);
+  }
+};
+
+// Modified displayTotalAmount function to use formatLargeAmount
+const displayTotalAmount = function () {
+  const totalAmount = expenseData.expenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+  expenseData.totalAmount = totalAmount;
+  totalAmountDisplay.textContent = "₹ " + formatLargeAmount(totalAmount);
+
+  if (totalAmount === 0) {
+    const newRow = `<tr> <td class="errorMsgForNoExpense"> No expense Found !! Add to manage your Expenses 🙂 </td> </tr>`;
+    document
+      .querySelector("#expenses tbody")
+      .insertAdjacentHTML("beforeend", newRow);
+  }
+};
+
+// Modified showExpenses function to format individual expense amounts
 const showExpenses = function (filterCategory = "All") {
   expensesTableBody.innerHTML = "";
 
@@ -58,11 +106,7 @@ const showExpenses = function (filterCategory = "All") {
         );
 
   filteredExpenses.forEach((exp) => {
-    const amountFormatted = new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 2,
-    }).format(exp.amount);
+    const amountFormatted = "₹ " + formatLargeAmount(exp.amount);
 
     const newRow = `<tr>
                     <td>${exp.name}</td>
@@ -88,41 +132,19 @@ const showExpenses = function (filterCategory = "All") {
   }
 };
 
-selectFilterCategory.addEventListener("change", function (e) {
-  showExpenses(e.target.value);
-});
-
-const saveExpensesToLocalStorage = function () {
-  localStorage.setItem("expenses", JSON.stringify(expenseData.expenses));
-};
-
-const displayTotalAmount = function () {
-  const totalAmount = expenseData.expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  );
-  expenseData.totalAmount = totalAmount;
-  totalAmountDisplay.textContent = new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 2,
-  }).format(totalAmount);
-};
-
 const displayCategoryTotal = function (filterCategory) {
   const categoryTotal = expenseData.expenses
     .filter((exp) => exp.category === filterCategory)
     .reduce((sum, exp) => sum + exp.amount, 0);
 
-  categoryTotalDisplay.innerHTML = `Expense for ${filterCategory}: &#8377; ${categoryTotal.toFixed(
-    2
-  )}`;
+  // Use formatLargeAmount to handle large numbers for category total
+  const formattedCategoryTotal = formatLargeAmount(categoryTotal);
+  categoryTotalDisplay.innerHTML = `Expense for ${filterCategory}: &#8377; ${formattedCategoryTotal}`;
 
-  if (categoryTotal.toFixed(2) == 0.0) {
+  // Display message if no expenses for the selected category
+  if (categoryTotal === 0) {
     const newRow = `<tr> <td class="errorMsgForNoExpense"> No Expenses for ${filterCategory} found !! </td> </tr>`;
-    document
-      .querySelector("#expenses tbody")
-      .insertAdjacentHTML("beforeend", newRow);
+    expensesTableBody.insertAdjacentHTML("beforeend", newRow);
   }
 };
 
@@ -187,15 +209,8 @@ const addExpense = function () {
     inputExpenseAmount.style.border = "2px solid red";
     isValid = false;
   } else {
-    if (amountAsNumber > 100000000000000) {
-      amountError.textContent =
-        "Please enter a valid amount between 0 and 1,000,000,000,000,00.";
-      inputExpenseAmount.style.border = "2px solid red";
-      isValid = false;
-    } else {
-      amountError.textContent = "";
-      inputExpenseAmount.style.border = "";
-    }
+    amountError.textContent = "";
+    inputExpenseAmount.style.border = "";
   }
 
   if (category === "Select Category") {
